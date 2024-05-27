@@ -5,9 +5,11 @@ import org.example.todoapi.dto.ToDoDTo;
 import org.example.todoapi.entity.ToDo;
 import org.example.todoapi.repository.ToDORepository;
 import org.example.todoapi.service.ToDoService;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -15,32 +17,59 @@ public class ToDoImpl implements ToDoService {
 
     private ToDORepository toDORepository;
 
+    private ModelMapper modelMapper;
+
     @Override
     public ToDoDTo addTodo(ToDoDTo toDoDTo) {
 
-        //CONVERT TODODTO ENTITIY INTO TODO JOA ENTITY
+        // Convert ToDoTo into TDO JPA entity
 
-        ToDo todo= new ToDo();
-        todo.setTitle(todo.getTitle());
-        todo.setDescription(todo.getDescription());
-        todo.setCompleted(todo.isCompleted());
+        ToDo todo = modelMapper.map(toDoDTo,ToDo.class);
 
-        // TODO JOA ENTITY
+        //TODO JPA Entity
         ToDo saveTodo=toDORepository.save(todo);
 
-        // CONVERT SAVED TODO JPA ENTITY ONJECT INTO TODODTO OBJECT
+        // Convert saved Todo Jpa object  into TODODTo object
 
-        ToDoDTo saveToDoDTo=new ToDoDTo();
-        saveToDoDTo.setId(saveTodo.getId());
-        saveToDoDTo.setTitle(saveTodo.getTitle());
-        saveToDoDTo.setDescription(saveTodo.getDescription());
-        saveToDoDTo.setCompleted(saveTodo.isCompleted());
+        ToDoDTo saveToDoDTo = modelMapper.map(saveTodo,ToDoDTo.class);
 
         return saveToDoDTo;
     }
 
     @Override
     public List<ToDoDTo> getAllTodos() {
-        return List.of();
+
+        List<ToDo> todos = toDORepository.findAll();
+        return  todos.stream().map((toDo) -> modelMapper.map(toDo,ToDoDTo.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public ToDoDTo getTodoById(Long id) {
+        ToDo todo= toDORepository.findById(id).orElseThrow(()->new RuntimeException("Not found with this Id"+id));
+        return modelMapper.map(todo,ToDoDTo.class);
+    }
+
+    @Override
+    public ToDoDTo updateTodo(Long id, ToDoDTo todo) {
+        ToDo todoUpdate= toDORepository.findById(id).orElseThrow(()->new RuntimeException("Not found with this Id"+id));
+        todoUpdate.setTitle(todo.getTitle());
+        todoUpdate.setDescription(todo.getDescription());
+        todoUpdate.setCompleted(todo.isCompleted());
+        ToDo updatedTodo=toDORepository.save(todoUpdate);
+        return modelMapper.map(updatedTodo,ToDoDTo.class);
+    }
+
+    @Override
+    public void deleteTodo(Long id) {
+        ToDo todo= toDORepository.findById(id).orElseThrow(()->new RuntimeException("Not found with this Id"+id));
+        toDORepository.deleteById(id);
+    }
+
+    @Override
+    public ToDoDTo completeTodo(Long id) {
+        ToDo todo= toDORepository.findById(id).orElseThrow(()->new RuntimeException("Not found with this Id"+id));
+        todo.setCompleted(true);
+        ToDo updatedTodo=toDORepository.save(todo);
+        return modelMapper.map(updatedTodo,ToDoDTo.class);
     }
 }
