@@ -1,5 +1,4 @@
 package org.example.todoapi.service.impl;
-
 import lombok.AllArgsConstructor;
 import org.example.todoapi.dto.ToDoDTo;
 import org.example.todoapi.entity.ToDo;
@@ -7,7 +6,6 @@ import org.example.todoapi.repository.ToDORepository;
 import org.example.todoapi.service.ToDoService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -72,4 +70,5 @@ public class ToDoImpl implements ToDoService {
         ToDo updatedTodo=toDORepository.save(todo);
         return modelMapper.map(updatedTodo,ToDoDTo.class);
     }
+
 }
