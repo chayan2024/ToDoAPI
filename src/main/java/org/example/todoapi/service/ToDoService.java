@@ -1,9 +1,8 @@
 package org.example.todoapi.service;
 
-import org.example.todoapi.dto.ToDoDTo;
-import org.example.todoapi.entity.ToDo;
-
 import java.util.List;
+
+import org.example.todoapi.dto.ToDoDTo;
 
 public interface ToDoService {
 
